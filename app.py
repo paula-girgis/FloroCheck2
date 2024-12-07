@@ -2,19 +2,19 @@ from flask import Flask, request, jsonify
 import tensorflow as tf
 from PIL import Image, UnidentifiedImageError
 import numpy as np
-
+from waitress import serve
 
 app = Flask(__name__)
 
-# Load the model with error handling
+# Load the model once when the app starts (before any request is handled)
 try:
-    model = tf.keras.models.load_model(r"best_model.keras")
+    model = tf.keras.models.load_model(r"best_model.keras")  # Ensure the model path is correct
     print("Model loaded successfully!")
 except (OSError, ValueError) as e:
     print(f"Error loading model: {e}")
-    model = None  # Set to None to prevent usage if not loaded
+    model = None  # If model can't be loaded, it will stay None
 
-# Define the disease classes
+# Define the disease classes (same as before)
 class_indices = {
     'Apple Cedar Rust': 0,
     'Apple Healthy': 1,
@@ -68,15 +68,16 @@ def predict():
         img_array = np.expand_dims(img_array, axis=0)
 
         # Predict with the disease model
+        if model is None:
+            return jsonify({'error': 'Model not loaded'}), 500
+        
         prediction = model.predict(img_array)
         confidence_scores = prediction[0]
         max_confidence = float(np.max(confidence_scores))
         predicted_class_idx = np.argmax(confidence_scores)
         
-
-        # # Set a confidence threshold to filter out invalid images
+        # Set a confidence threshold to filter out invalid images
         threshold = 0.68  # Adjust this based on your model's behavior
-        
         if max_confidence < threshold:
             return jsonify({'error': 'Invalid photo. Please upload a plant leaf image.'}), 400
 
@@ -99,5 +100,7 @@ def predict():
 def not_found_error(error):
     return jsonify({'error': 'Not Found. The API endpoint you are trying to access does not exist.'}), 404
 
+
 if __name__ == '__main__':
-    app.run()
+    # Run the app using Waitress for production
+    serve(app, host='0.0.0.0', port=8000)  # This will serve the app on Render
