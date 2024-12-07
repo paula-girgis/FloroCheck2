@@ -1,76 +1,9 @@
-absl-py==2.1.0
-archspec @ file:///home/conda/feedstock_root/build_artifacts/archspec_1708969572489/work
-astunparse==1.6.3
-blinker==1.9.0
-boltons @ file:///home/conda/feedstock_root/build_artifacts/boltons_1711936407380/work
-Brotli @ file:///D:/bld/brotli-split_1725267609074/work
-certifi @ file:///home/conda/feedstock_root/build_artifacts/certifi_1725278078093/work/certifi
-cffi @ file:///D:/bld/cffi_1725560655177/work
-charset-normalizer @ file:///home/conda/feedstock_root/build_artifacts/charset-normalizer_1728479282467/work
-click==8.1.7
-colorama @ file:///home/conda/feedstock_root/build_artifacts/colorama_1666700638685/work
-conda @ file:///D:/bld/conda_1727791958386/work
-conda-libmamba-solver @ file:///home/conda/feedstock_root/build_artifacts/conda-libmamba-solver_1727359833193/work/src
-conda-package-handling @ file:///home/conda/feedstock_root/build_artifacts/conda-package-handling_1729006966809/work
-conda_package_streaming @ file:///home/conda/feedstock_root/build_artifacts/conda-package-streaming_1729004031731/work
-distro @ file:///home/conda/feedstock_root/build_artifacts/distro_1704321475663/work
 Flask==3.1.0
-flatbuffers==24.3.25
-frozendict @ file:///D:/bld/frozendict_1728841449408/work
-gast==0.6.0
-google-pasta==0.2.0
-grpcio==1.68.1
-gunicorn==23.0.0
-h2 @ file:///home/conda/feedstock_root/build_artifacts/h2_1634280454336/work
-h5py==3.12.1
-hpack==4.0.0
-hyperframe @ file:///home/conda/feedstock_root/build_artifacts/hyperframe_1619110129307/work
-idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1726459485162/work
-itsdangerous==2.2.0
-Jinja2==3.1.4
-jsonpatch @ file:///home/conda/feedstock_root/build_artifacts/jsonpatch_1695536281965/work
-jsonpointer @ file:///D:/bld/jsonpointer_1725303007361/work
-keras==3.7.0
-libclang==18.1.1
-libmambapy @ file:///D:/bld/mamba-split_1725066316332/work/libmambapy
-mamba @ file:///D:/bld/mamba-split_1725066316332/work/mamba
-Markdown==3.7
-markdown-it-py==3.0.0
-MarkupSafe==3.0.2
-mdurl==0.1.2
-menuinst @ file:///D:/bld/menuinst_1725359027500/work
-ml-dtypes==0.4.1
-namex==0.0.8
-numpy==2.0.2
-opt_einsum==3.4.0
-optree==0.13.1
-packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1718189413536/work
-pillow==11.0.0
-platformdirs @ file:///home/conda/feedstock_root/build_artifacts/platformdirs_1726613481435/work
-pluggy @ file:///home/conda/feedstock_root/build_artifacts/pluggy_1713667077545/work
-protobuf==5.29.1
-pycosat @ file:///D:/bld/pycosat_1696355949390/work
-pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1711811537435/work
-Pygments==2.18.0
-PySocks @ file:///D:/bld/pysocks_1661604991356/work
-requests @ file:///home/conda/feedstock_root/build_artifacts/requests_1717057054362/work
-rich==13.9.4
-ruamel.yaml @ file:///D:/bld/ruamel.yaml_1728765111308/work
-ruamel.yaml.clib @ file:///D:/bld/ruamel.yaml.clib_1728724639208/work
-setuptools==75.1.0
-six==1.17.0
-tensorboard==2.18.0
-tensorboard-data-server==0.7.2
 tensorflow==2.18.0
-tensorflow_intel==2.18.0
-termcolor==2.5.0
-tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1722737464726/work
-truststore @ file:///home/conda/feedstock_root/build_artifacts/truststore_1724770958874/work
-typing_extensions==4.12.2
-urllib3 @ file:///home/conda/feedstock_root/build_artifacts/urllib3_1726496430923/work
-waitress==3.0.2
-Werkzeug==3.1.3
-wheel==0.44.0
-win_inet_pton @ file:///D:/bld/win_inet_pton_1727796272493/work
-wrapt==1.17.0
-zstandard==0.23.0
+keras==3.7.0
+gunicorn==23.0.0
+numpy==2.0.2
+h5py==3.12.1
+pillow==11.0.0
+tensorboard==2.18.0
+requests==2.28.1
