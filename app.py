@@ -1,20 +1,25 @@
 from flask import Flask, request, jsonify
 import tensorflow as tf
-from PIL import Image, UnidentifiedImageError
 import numpy as np
-from waitress import serve
+import cv2
+from flask_caching import Cache
+import time
 
 app = Flask(__name__)
 
-# Load the model once when the app starts (before any request is handled)
+# Setup caching for faster responses
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+# Load the TensorFlow Lite model
 try:
-    model = tf.keras.models.load_model(r"best_model.keras")  # Ensure the model path is correct
+    interpreter = tf.lite.Interpreter(model_path="best_model.tflite")
+    interpreter.allocate_tensors()
     print("Model loaded successfully!")
 except (OSError, ValueError) as e:
     print(f"Error loading model: {e}")
-    model = None  # If model can't be loaded, it will stay None
+    interpreter = None  # If model can't be loaded, it will stay None
 
-# Define the disease classes (same as before)
+# Define the disease classes
 class_indices = {
     'Apple Cedar Rust': 0,
     'Apple Healthy': 1,
@@ -46,7 +51,15 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Efficient image preprocessing with OpenCV
+def preprocess_image(file):
+    img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+    img = cv2.resize(img, (224, 224)) / 255.0
+    img_array = np.expand_dims(img, axis=0)
+    return img_array
+
 @app.route('/predict', methods=['POST'])
+@cache.cached(timeout=300, key_prefix=lambda: request.files['file'].filename)  # Cache prediction for 5 minutes
 def predict():
     try:
         if 'file' not in request.files or not request.files['file']:
@@ -57,25 +70,34 @@ def predict():
         if not allowed_file(file.filename):
             return jsonify({'error': f'Invalid file type. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
 
-        try:
-            img = Image.open(file)
-        except UnidentifiedImageError:
-            return jsonify({'error': 'Invalid image file. Ensure the file is a valid image.'}), 400
+        # Preprocess the image
+        img_array = preprocess_image(file)
 
-        # Resize and preprocess the image
-        img = img.resize((224, 224))
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
-
-        # Predict with the disease model
-        if model is None:
+        # Predict with the disease model using TensorFlow Lite
+        if interpreter is None:
             return jsonify({'error': 'Model not loaded'}), 500
+
+        # Measure the response time
+        start_time = time.time()
+
+        # Set input tensor for the interpreter
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+
+        interpreter.set_tensor(input_details[0]['index'], img_array)
         
-        prediction = model.predict(img_array)
-        confidence_scores = prediction[0]
+        # Run inference
+        interpreter.invoke()
+
+        # Get the prediction results
+        confidence_scores = interpreter.get_tensor(output_details[0]['index'])[0]
+
+        # Measure the elapsed time for prediction
+        response_time = round(time.time() - start_time, 2)
+
         max_confidence = float(np.max(confidence_scores))
         predicted_class_idx = np.argmax(confidence_scores)
-        
+
         # Set a confidence threshold to filter out invalid images
         threshold = 0.68  # Adjust this based on your model's behavior
         if max_confidence < threshold:
@@ -86,7 +108,8 @@ def predict():
             predicted_class_name = class_map[predicted_class_idx]
             return jsonify({
                 'predicted_class': predicted_class_name,
-                'confidence': max_confidence
+                'confidence': max_confidence,
+                'response_time': response_time  # Send response time
             })
         else:
             return jsonify({'error': 'Disease not supported yet'}), 400
@@ -102,5 +125,5 @@ def not_found_error(error):
 
 
 if __name__ == '__main__':
-    # Run the app using Waitress for production
-    serve(app, host='0.0.0.0', port=8000)  # This will serve the app on Render
+    # Enable debugging in local environment
+    app.run(debug=True, host='0.0.0.0', port=8000)
